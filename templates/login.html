@@ -1,0 +1,79 @@
+{% extends "main.html" %}
+{% block content %}
+<!-- Page Title -->
+<div class="container">
+
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12" align="center">
+        <h1 class="page-header">Oracle Cloud Infrastructure Account</h1>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page Content -->
+  <div class="container login-container">
+    <div class="row">
+      <div class="col-md-12">
+        <!-- OCI Account Form -->
+        <form method="post">
+          <!-- OCI User OCID Input -->
+          <div class="form-row">
+            <div class="form-group col-md-12">
+              <label for="user_ocid">User OCID</label>
+              <input type="text" class="form-control" id="user_ocid" name="user_ocid" placeholder="User OCID">
+            </div>
+          </div>
+          <!-- OCI Tenancy OCID Input -->
+          <div class="form-row">
+            <div class="form-group col-md-12">
+              <label for="tenancy_ocid">Tenancy OCID</label>
+              <input type="text" class="form-control" id="tenancy_ocid" name="tenancy_ocid" placeholder="Tenancy OCID">
+            </div>
+          </div>
+          <!-- Fingerprint Input -->
+          <div class="form-row">
+            <div class="form-group col-md-12">
+              <label for="fingerprint">Fingerprint</label>
+              <input type="text" class="form-control" id="fingerprint" name="fingerprint" placeholder="Fingerprint">
+            </div>
+          </div>
+          <!-- API Key Selection -->
+          <div class="form-row">
+            <div class="form-group col-md-12">
+              <label for="api_key">API Key</label>
+              <textarea class="form-control" id="api_key" name="api_key" placeholder="API Key"></textarea>
+            </div>
+          </div>
+          <!-- OCI Region Selection -->
+          <div class="form-row">
+            <div class="form-group col-md-12">
+              <label for="region">Region</label>
+              <input type="text" class="form-control" id="region" name="region" placeholder="Region">
+            </div>
+          </div>
+          <!-- OCI Compartment Selection -->
+          <div class="form-row">
+            <div class="form-group col-md-12">
+              <label for="compartment">Compartment OCID</label>
+              <input type="text" class="form-control" id="compartment_ocid" name="compartment_ocid" placeholder="Compartment OCID">
+            </div>
+          </div>
+          <!-- Submit Button -->
+          <div class="form-row">
+            <div class="form-group col-md-12">
+              <button type="submit" class="btn btn-primary submit-btn">Submit</button>
+            </div>
+          </div>
+
+        </form>
+        <!-- End of Form -->
+        {% if error %}
+            <div>{{ err_message }}</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

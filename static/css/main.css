@@ -1,0 +1,135 @@
+/*
+Main Hex Colors
+Blue: #027bc7
+Background Grey: #f2f4f5
+Button Grey: #707070
+*/
+@import url('https://fonts.googleapis.com/css?family=Raleway');
+
+body {
+  font-family: "Raleway", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+/* text {
+  pointer-events: none;
+}
+
+path {
+  stroke: #fff;
+} */
+
+path {
+  stroke: #fff;
+  fill-rule: evenodd;
+}
+
+text {
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+}
+
+/* Body */
+body {
+  background: #f2f4f5;
+}
+
+.btn-primary {
+  background-color: #027bc7;
+  border-color: #027bc7;
+}
+
+/* Main Header */
+.header-btn-col {
+  padding: 20px;
+}
+
+.header-btn {
+  background-color: #027bc7;
+  border-color: #027bc7;
+  width: 90px;
+  margin-left: 8px;
+}
+
+.header-logo {
+  height: 40px;
+  margin-top: 20px;
+}
+
+
+/* Main Content */
+.page-header {
+  color: #027bc7;
+  border-style: none;
+  font-size: 28px;
+  margin: 20px 0 10px;
+  font-weight: bold;
+}
+
+.content-container {
+  background-color: #fff;
+  padding: 30px;
+  box-shadow: 6px 6px 8px 2px rgba(0,0,0,.2);
+  margin: 60px 20px 20px;
+  height: 500px;
+}
+
+.login-container {
+  background-color: #fff;
+  padding: 30px;
+  box-shadow: 6px 6px 8px 2px rgba(0,0,0,.2);
+}
+
+.chart-container {
+  margin: 60px 20px 20px;
+}
+
+.submit-btn {
+  width: 100%;
+  font-weight: bold;
+}
+
+.next-btn {
+  width: 100%;
+  font-weight: bold;
+}
+
+.back-btn {
+  width: 100%;
+  font-weight: bold;
+  background-color: #707070;
+  border-color: #707070;
+}
+
+
+/* Source Page */
+.source-btn {
+  width: 100%;
+  margin: 6px 0;
+}
+
+.source-backbtn {
+  width: 100%;
+  font-weight: bold;
+  background-color: #707070;
+  border-color: #707070;
+  margin: 6px 0;
+}
+
+.slice {
+    cursor: pointer;
+}
+
+.slice .main-arc {
+    stroke: #fff;
+    stroke-width: 1px;
+}
+
+.slice .hidden-arc {
+    fill: none;
+}
+
+.slice text {
+    pointer-events: none;
+    dominant-baseline: middle;
+    text-anchor: middle;
+}

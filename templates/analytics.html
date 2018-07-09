@@ -1,0 +1,225 @@
+{% extends "main.html" %}
+{% block content %}
+<div class="container">
+  <div class="row">
+
+    <div class="col-md-6">
+      <div class="content-container" id="details">
+        <div id="title"></div>
+        <div id="type"></div>
+        <div id="ocid"></div>
+        <div id="lifecycle_state"></div>
+        <div id="created"></div>
+        <div>Tags:</div>
+        <div id="tags"></div>
+        <div id="detail_01"></div>
+        <div id="detail_02"></div>
+        <div id="detail_03"></div>
+        <div id="detail_04"></div>
+        <div id="detail_05"></div>
+        <div id="detail_06"></div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="chart-container">
+        <svg></svg>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+
+
+
+  var data = {{ data|safe }};
+
+  document.getElementById('title').innerHTML = data["name"];
+  document.getElementById('type').innerHTML = data["type"];
+  document.getElementById('ocid').innerHTML = data["ocid"];
+  document.getElementById('lifecycle_state').innerHTML = data["lifecycle_state"];
+  document.getElementById('created').innerHTML = data["created"];
+  for(var key in data["tags"]) {
+    var div = document.createElement('div');
+    div.className = 'tag';
+    div.innerHTML = key + ": " + data["tags"][key];
+    document.getElementById('tags').appendChild(div);
+  };
+  if(!document.getElementById('tags').firstChild){
+    var div = document.createElement('div');
+    div.className = 'tag';
+    div.innerHTML = "None";
+    document.getElementById('tags').appendChild(div);
+  };
+
+  // Variables
+  const width = 500,
+      height = 500,
+      radius = (Math.min(width, height) / 2);
+
+  const formatNumber = d3.format(',d');
+
+  const x = d3.scaleLinear()
+      .range([0, 2 * Math.PI])
+      .clamp(true);
+
+  const y = d3.scaleSqrt()
+      .range([radius*.1, radius]);
+
+  const color = d3.scaleOrdinal(d3.schemeCategory20c);
+
+  const partition = d3.partition();
+
+  const arc = d3.arc()
+      .startAngle(d => x(d.x0))
+      .endAngle(d => x(d.x1))
+      .innerRadius(d => Math.max(0, y(d.y0)))
+      .outerRadius(d => Math.max(0, y(d.y1)));
+
+  const middleArcLine = d => {
+      const halfPi = Math.PI/2;
+      const angles = [x(d.x0) - halfPi, x(d.x1) - halfPi];
+      const r = Math.max(0, (y(d.y0) + y(d.y1)) / 2);
+
+      const middleAngle = (angles[1] + angles[0]) / 2;
+      const invertDirection = middleAngle > 0 && middleAngle < Math.PI; // On lower quadrants write text ccw
+      if (invertDirection) { angles.reverse(); }
+
+      const path = d3.path();
+      path.arc(0, 0, r, angles[0], angles[1], invertDirection);
+      return path.toString();
+  };
+
+  const textFits = d => {
+      const CHAR_SPACE = 6;
+
+      const deltaAngle = x(d.x1) - x(d.x0);
+      const r = Math.max(0, (y(d.y0) + y(d.y1)) / 2);
+      const perimeter = r * deltaAngle;
+
+      return d.data.name.length * CHAR_SPACE < perimeter;
+  };
+
+  const svg = d3.select('svg')
+      .style('width', width)
+      .style('height', height)
+      .attr('viewBox', `${-width / 2} ${-height / 2} ${width} ${height}`)
+      .on('click', () => focusOn()); // Reset zoom on canvas click
+
+  root = d3.hierarchy(data);
+  root.sum(d => d.size);
+
+  const slice = svg.selectAll('g.slice')
+      .data(partition(root).descendants());
+
+  slice.exit().remove();
+
+  const newSlice = slice.enter()
+      .append('g').attr('class', 'slice')
+      .on('click', d => {
+          d3.event.stopPropagation();
+          focusOn(d);
+      });
+
+  newSlice.append('title')
+      .text(d => d.data.name + '\n' + formatNumber(d.value));
+
+  newSlice.append('path')
+      .attr('class', 'main-arc')
+      .style('fill', d => getColor(d))
+      .attr('d', arc);
+
+  newSlice.append('path')
+      .attr('class', 'hidden-arc')
+      .attr('id', (_, i) => `hiddenArc${i}`)
+      .attr('d', middleArcLine)
+      .attr('opacity', 0);
+
+  const text = newSlice.append('text')
+      .attr('display', d => textFits(d) ? null : 'none');
+
+  // Add white contour
+  text.append('textPath')
+      .attr('startOffset','50%')
+      .attr('xlink:href', (_, i) => `#hiddenArc${i}` )
+      .text(d => d.data.name)
+      .style('fill', 'none')
+      .style('stroke', '#fff')
+      .style('stroke-width', 5)
+      .style('stroke-linejoin', 'round');
+
+  text.append('textPath')
+      .attr('startOffset','50%')
+      .attr('xlink:href', (_, i) => `#hiddenArc${i}` )
+      .text(d => d.data.name);
+
+
+  function getColor(d) {
+    console.log(d.data["tags"]);
+    if("tags" in d.data){
+      if("user" in d.data["tags"]){
+        return "#4286f4";
+      };
+    };
+    return "#e20f00";
+  };
+
+  function focusOn(d = { x0: 0, x1: 1, y0: 0, y1: 1 }) {
+      // Reset to top-level if no data point specified
+
+      const transition = svg.transition()
+          .duration(750)
+          .tween('scale', () => {
+              const xd = d3.interpolate(x.domain(), [d.x0, d.x1]),
+                  yd = d3.interpolate(y.domain(), [d.y0, 1]);
+              return t => { x.domain(xd(t)); y.domain(yd(t)); };
+          });
+
+      transition.selectAll('path.main-arc')
+          .attrTween('d', d => () => arc(d));
+
+      transition.selectAll('path.hidden-arc')
+          .attrTween('d', d => () => middleArcLine(d));
+
+      transition.selectAll('text')
+          .attrTween('display', d => () => textFits(d) ? null : 'none');
+
+      moveStackToFront(d);
+
+      tags_div = document.getElementById("tags")
+      while (tags_div.hasChildNodes()) {
+          tags_div.removeChild(tags_div.lastChild);
+      };
+      document.getElementById('title').innerHTML = d.data["name"];
+      document.getElementById('type').innerHTML = d.data["type"];
+      document.getElementById('ocid').innerHTML = d.data["ocid"];
+      document.getElementById('lifecycle_state').innerHTML = d.data["lifecycle_state"];
+      var date = new Date(d.data["created"]);
+      document.getElementById('created').innerHTML = date;
+      for(var key in d.data["tags"]) {
+        var div = document.createElement('div');
+        div.className = 'tag';
+        div.innerHTML = key + ": " + d.data["tags"][key];
+        document.getElementById('tags').appendChild(div);
+      };
+      if(!document.getElementById('tags').firstChild){
+        var div = document.createElement('div');
+        div.className = 'tag';
+        div.innerHTML = "None";
+        document.getElementById('tags').appendChild(div);
+      };
+
+      //
+
+      function moveStackToFront(elD) {
+          svg.selectAll('.slice').filter(d => d === elD)
+              .each(function(d) {
+                  this.parentNode.appendChild(this);
+                  if (d.parent) { moveStackToFront(d.parent); }
+              })
+      }
+  }
+</script>
+<!-- <script type="text/javascript" src="/static/js/word-cloud.js"></script> -->
+
+{% endblock %}
